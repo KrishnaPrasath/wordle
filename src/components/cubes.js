@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Cubicles from './Cubicles';
+import Cubicles from './cubicles';
 import ToastEmitter from './ToastEmitter';
 import Modal from './ReportModal';
 import { mock5LetterWords } from '../data/words';
