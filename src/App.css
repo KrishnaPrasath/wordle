@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
 .App {
   text-align: center;
 }
@@ -35,4 +37,65 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+#inputOne {
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.cubic {
+  display: block;
+  min-height: 2rem;
+  width: 4rem;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-weight: 600;
+  text-transform: capitalize;
+  /* border: black solid 0.1rem; */
+}
+
+.cubicles-wrapper {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.tries-over {
+  cursor: none;
+  pointer-events: block;
+  opacity: 50%;
+}
+
+.grey {
+  background-color: #bbbbbf;
+}
+
+.green {
+  background-color: #9ef01a;
+}
+
+.yellow {
+  background-color: #ffd60a;
+}
+
+.title {
+  font-family: 'Permanent Marker', cursive;
+  padding: 1rem;
+  font-size: 64px;
+  font-weight: 400;
+}
+
+.modal-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-weight: 600;
+  font-size: 64px;
+  font-family: 'Permanent Marker', cursive;
 }
