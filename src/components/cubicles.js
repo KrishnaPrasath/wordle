@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 const Cubic = ({ id, colorCode, letter }) => {
   return <div id={id} className={`cubic ${colorCode} rounded shadow-sm`}>{letter}</div>;

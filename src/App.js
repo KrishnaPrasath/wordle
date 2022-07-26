@@ -1,6 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Cubes from './components/cubes';
+import Cubes from './components/Cubes';
 
 function App() {
   return (
