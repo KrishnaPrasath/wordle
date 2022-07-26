@@ -1,15 +1,15 @@
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
+import wordleImage from './../icons/wordle.svg';
 
-function ToastEmitter({ show, messages, setToastShow }) {
+function ToastEmitter({ show, message, setToastShow }) {
 
   return (
     <ToastContainer position='bottom-end' className='p-3'>
-      {messages.map((message, idx) => {
-        return (
+      {message && 
           <Toast
             bg={message.variant.toLowerCase()}
-            key={idx}
+            key={'toast'}
             show={show}
             delay={3000}
             onClose={() => setToastShow(false)}
@@ -17,17 +17,18 @@ function ToastEmitter({ show, messages, setToastShow }) {
           >
             <Toast.Header>
               <img
-                src='holder.js/20x20?text=%20'
+                src={wordleImage}
                 className='rounded me-2'
-                alt='toast image'
+                alt='toast identifier'
+                width={30}
+                height={30}
               />
               <strong className='me-auto'>{message.title}</strong>
               {/* <small className="text-muted">just now</small> */}
             </Toast.Header>
             <Toast.Body>{message.body}</Toast.Body>
           </Toast>
-        );
-      })}
+      }
     </ToastContainer>
   );
 }

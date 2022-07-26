@@ -18,7 +18,7 @@ const Cubes = () => {
   const [modalShow, setModalShow] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [toastShow, setToastShow] = useState(true);
-  const [toastMessages, setToastMessages] = useState([]);
+  const [toastMessage, setToastMessage] = useState('');
 
   /*
     toastMessage = {
@@ -30,22 +30,31 @@ const Cubes = () => {
 
   const { width, height } = useWindowSize();
 
-  const addValidatedToastMessages = (message) => {
-    setToastMessages(toastMessages => [...toastMessages, message])
-  }
+  const addValidatedToastMessage = (message) => {
+    setToastShow(true);
+    setToastMessage(message);
+  };
 
   const validationCallback = (codes) => {
     if (codes.every((i) => i === GREEN)) {
       setTries(MAX_TRIES);
       setStatus(1);
       setModalShow(true);
-      setModalMessage('Better luck next time! :(');
-      addValidatedToastMessages({body: 'Congratulations!', title: 'Wordle toast', variant: 'Light'});
+      setModalMessage('Congratulations! :)');
+      addValidatedToastMessage({
+        body: 'Congratulations!',
+        title: 'toast!!',
+        variant: 'Light',
+      });
       return;
     } else if (tries >= MAX_TRIES - 1) {
       setModalShow(true);
       setModalMessage('Better luck next time! :(');
-      addValidatedToastMessages({body: 'Better luck next time! :(', title: 'Wordle toast', variant: 'Light'});
+      addValidatedToastMessage({
+        body: 'Better luck next time! :(',
+        title: 'toast!!',
+        variant: 'Light',
+      });
       return;
     }
     setInputOne('');
@@ -74,12 +83,20 @@ const Cubes = () => {
 
   const verifyBtn = () => {
     if (inputOne.length === WORD_LENGTH) {
-      if (tries < MAX_TRIES) {
-        setTries((prev) => ++prev);
-        let currentColorCodes = generateColorCode(inputOne);
-        setInputHistory([...inputHistory, inputOne]);
-        setColorCodes([...colorCodes, currentColorCodes]);
-        validationCallback(currentColorCodes);
+      if (mock5LetterWords.includes(inputOne)) {
+        if (tries < MAX_TRIES) {
+          setTries((prev) => ++prev);
+          let currentColorCodes = generateColorCode(inputOne);
+          setInputHistory([...inputHistory, inputOne]);
+          setColorCodes([...colorCodes, currentColorCodes]);
+          validationCallback(currentColorCodes);
+        }
+      } else {
+        addValidatedToastMessage({
+          body: `The word doesn't exist in the dictionary, try another word.`,
+          title: 'toast!!',
+          variant: 'Light',
+        });
       }
     }
   };
@@ -96,7 +113,7 @@ const Cubes = () => {
     setTries(0);
     setRandomWord();
     setInputOne('');
-    setToastMessages([]);
+    setToastMessage('');
   };
 
   useEffect(() => {
@@ -108,11 +125,11 @@ const Cubes = () => {
       {status === 1 && (
         <Confetti width={width} height={height} numberOfPieces={200} />
       )}
-      {true && (
+      {toastMessage && (
         <ToastEmitter
           variant={'danger'}
           show={toastShow}
-          messages={toastMessages}
+          message={toastMessage}
           setToastShow={setToastShow}
         />
       )}
@@ -129,6 +146,7 @@ const Cubes = () => {
           type='text'
           aria-label='Enter a 5 letter word...'
           aria-describedby='button-addon2'
+          autoComplete='off'
         ></input>
         <div className='d-flex'>
           <Button
