@@ -19,6 +19,7 @@ const Cubes = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [toastShow, setToastShow] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
+  const difficultyLevel = 'easy';
 
   /*
     toastMessage = {
@@ -64,8 +65,9 @@ const Cubes = () => {
   const generateColorCode = (input) => {
     let verifiedLetters = [];
     return input.split('').map((letter, idx) => {
+      const regEx = new RegExp(letter, 'g');
       let colorCode = GREY;
-      if (verifiedLetters.includes(letter)) {
+      if (verifiedLetters.includes(letter) && ((word.match(regEx)||[]).length <= (verifiedLetters.join('').match(regEx)||[]).length))  {
         verifiedLetters.push(letter);
         return colorCode;
       } else {
@@ -83,7 +85,7 @@ const Cubes = () => {
 
   const verifyBtn = () => {
     if (inputOne.length === WORD_LENGTH) {
-      if (mock5LetterWords.includes(inputOne)) {
+      if (mock5LetterWords.includes(inputOne) || difficultyLevel === 'easy') {
         if (tries < MAX_TRIES) {
           setTries((prev) => ++prev);
           let currentColorCodes = generateColorCode(inputOne);
