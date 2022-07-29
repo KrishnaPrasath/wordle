@@ -27,3 +27,7 @@ export function useWindowSize() {
     }, []); // Empty array ensures that effect is only run on mount
     return windowSize;
   }
+
+export const fillColorCodes = (colorCode) => {
+  return new Array(6).fill(new Array(5).fill(colorCode))
+}

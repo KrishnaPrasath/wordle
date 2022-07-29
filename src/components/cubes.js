@@ -3,7 +3,7 @@ import Cubicles from './cubicles';
 import ToastEmitter from './ToastEmitter';
 import Modal from './ReportModal';
 import { mock5LetterWords } from '../data/words';
-import { getRandomWord, useWindowSize } from '../utils/utils';
+import { getRandomWord, useWindowSize, fillColorCodes } from '../utils/utils';
 import { GREEN, GREY, YELLOW, MAX_TRIES, WORD_LENGTH } from '../data/constants';
 import Confetti from 'react-confetti';
 import { Button } from 'react-bootstrap';
@@ -12,7 +12,7 @@ const Cubes = () => {
   const [word, setWord] = useState('');
   const [inputOne, setInputOne] = useState('');
   const [inputHistory, setInputHistory] = useState([]);
-  const [colorCodes, setColorCodes] = useState([]);
+  const [colorCodes, setColorCodes] = useState(fillColorCodes(GREY));
   const [tries, setTries] = useState(0);
   const [status, setStatus] = useState(null); // 0 = no win ; 1 = win;
   const [modalShow, setModalShow] = useState(false);
@@ -20,14 +20,6 @@ const Cubes = () => {
   const [toastShow, setToastShow] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const difficultyLevel = 'easy';
-
-  /*
-    toastMessage = {
-      body: string,
-      title: string,
-      variant: string,
-    }
-  */
 
   const { width, height } = useWindowSize();
 
@@ -67,7 +59,11 @@ const Cubes = () => {
     return input.split('').map((letter, idx) => {
       const regEx = new RegExp(letter, 'g');
       let colorCode = GREY;
-      if (verifiedLetters.includes(letter) && ((word.match(regEx)||[]).length <= (verifiedLetters.join('').match(regEx)||[]).length))  {
+      if (
+        verifiedLetters.includes(letter) &&
+        (word.match(regEx) || []).length <=
+          (verifiedLetters.join('').match(regEx) || []).length
+      ) {
         verifiedLetters.push(letter);
         return colorCode;
       } else {
@@ -89,8 +85,11 @@ const Cubes = () => {
         if (tries < MAX_TRIES) {
           setTries((prev) => ++prev);
           let currentColorCodes = generateColorCode(inputOne);
-          setInputHistory([...inputHistory, inputOne]);
-          setColorCodes([...colorCodes, currentColorCodes]);
+          setColorCodes((prev) => {
+            let temp = [...prev];
+            temp[tries] = currentColorCodes;
+            return temp;
+          });
           validationCallback(currentColorCodes);
         }
       } else {
@@ -109,7 +108,7 @@ const Cubes = () => {
   };
 
   const resetBtn = () => {
-    setColorCodes([]);
+    setColorCodes(fillColorCodes(GREY));
     setStatus(0);
     setInputHistory([]);
     setTries(0);
@@ -118,9 +117,43 @@ const Cubes = () => {
     setToastMessage('');
   };
 
+  const handleOnChange = (e) => {
+    // if(e.code === "Enter"){
+
+    //   return;
+    // }
+    // if(e.code)
+    // let currentGuess = e.key.toLowerCase();
+    // setInputOne(prevGuess => prevGuess + currentGuess);
+    // setInputHistory((prev) => {
+    //   let temp = [...prev];
+    //   if (tries + 1 >= temp.length && currentGuess) {
+    //     console.log(temp, tries)
+    //     temp[tries] = (temp[tries] ? temp[tries] : '') + currentGuess;
+    //   }
+    //   return temp;
+    // });
+    // Below is for input field
+    let currentGuess = e.target.value.toLowerCase();
+    setInputOne(currentGuess);
+    setInputHistory((prev) => {
+      let temp = [...prev];
+      if (tries + 1 >= temp.length && currentGuess) {
+        temp[tries] = currentGuess;
+      }
+      return temp;
+    });
+  };
+
   useEffect(() => {
     setRandomWord();
   }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleOnChange);
+
+    return () => window.addEventListener('keydown', handleOnChange);
+  }, [handleOnChange]);
 
   return (
     <>
@@ -139,8 +172,8 @@ const Cubes = () => {
         <input
           id='inputOne'
           value={inputOne}
-          onChange={(e) => setInputOne(e.target.value.toLowerCase())}
-          maxLength={5}
+          onChange={handleOnChange}
+          maxLength={WORD_LENGTH}
           autoFocus
           onKeyPress={(e) => e.code === 'Enter' && verifyBtn()}
           placeholder='Enter a 5 letter word...'
