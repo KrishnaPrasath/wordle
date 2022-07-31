@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Cubicles from './cubicles';
+import Keypad from './Keypad';
 import ToastEmitter from './ToastEmitter';
 import Modal from './ReportModal';
 import { mock5LetterWords } from '../data/words';
@@ -28,7 +29,6 @@ const Cubes = () => {
   const triesRef = React.useRef(tries);
   const wordRef = React.useRef(word);
   const statusRef = React.useRef(status);
-  const decoyInputReference = React.useRef(null);
   // decoy setStates
   const _setInputOne = (enteredKey, keyCode = null) => {
     if (keyCode === 'Backspace') {
@@ -69,7 +69,6 @@ const Cubes = () => {
     setRandomWord();
     setToastMessage('');
     setModalMessage('');
-    decoyInputReference?.current?.focus();
   };
 
   useEffect(() => {
@@ -183,7 +182,22 @@ const Cubes = () => {
     }
   };
 
-  const handleOnChange = (e) => {
+  const handleOnChange = (e, type = null) => {
+    console.log(e, type);
+    if (type === 'CLICK') {
+      if (e === 'SUBMIT') {
+        verifyBtn();
+        return;
+      }
+      if (e === 'DELETE' && inputOneRef.current.length > 0) {
+        inputOneRef.current.length && _setInputOne('', 'Backspace');
+        return;
+      }
+      if (e !== 'DELETE' && e !== 'SUBMIT' && inputOneRef.current.length < 5) {
+        _setInputOne(e.toLowerCase());
+        return;
+      }
+    }
     if (statusRef.current === null) {
       if (e.code === 'Enter') {
         verifyBtn();
@@ -236,14 +250,11 @@ const Cubes = () => {
       </div>
       <div className="cubicles-container">
         {colorCodes.map((colorCode, idx) => (
-          <Cubicles
-            key={idx}
-            index={idx}
-            colorCodes={colorCode}
-            inputHistory={inputHistory[idx]}
-            decoyInputReference={decoyInputReference}
-          />
+          <Cubicles key={idx} index={idx} colorCodes={colorCode} inputHistory={inputHistory[idx]} />
         ))}
+      </div>
+      <div className="key-cube-container">
+        <Keypad id={'keyPad'} handleOnChange={handleOnChange} />
       </div>
       <Modal show={modalShow} onHide={() => setModalShow(false)} message={modalMessage} />
     </>
