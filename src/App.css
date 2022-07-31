@@ -88,6 +88,11 @@ body {
   /* border: black solid 0.1rem; */
 }
 
+.decoy {
+  position: absolute;
+  opacity: 0;
+}
+
 .cubicles-wrapper {
   padding: 1rem;
   display: flex;
