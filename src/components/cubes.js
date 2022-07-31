@@ -229,7 +229,7 @@ const Cubes = () => {
       </div>
       <div className="cubicles-container">
         {colorCodes.map((colorCode, idx) => (
-          <Cubicles key={idx} colorCodes={colorCode} inputHistory={inputHistory[idx]} />
+          <Cubicles key={idx} index={idx} colorCodes={colorCode} inputHistory={inputHistory[idx]} />
         ))}
       </div>
       <Modal show={modalShow} onHide={() => setModalShow(false)} message={modalMessage} />

@@ -12,17 +12,20 @@ const Cubic = ({ id, colorCode, letter }) => {
   }, [letter]);
 
   return (
-    <div id={id} className={`cubic ${colorCode} rounded shadow ${animate && 'press'}`}>
+    <div id={id} type="input" className={`cubic ${colorCode} rounded shadow ${animate && 'press'}`} style={{cursor: 'pointer'}} onClick={() => {
+      console.log('prompt');
+      prompt();
+    }}>
       {letter}
     </div>
   );
 };
 
-const Cubicles = ({ colorCodes, inputHistory }) => {
+const Cubicles = ({ colorCodes, inputHistory, index }) => {
   return (
     <div className={`cubicles-wrapper`}>
       {colorCodes.map((colorCode, idx) => (
-        <Cubic id={`cubic${idx}`} key={idx} colorCode={colorCode} letter={inputHistory ? inputHistory[idx] : ''} />
+        <Cubic id={`cubic${idx}`} key={idx} colorCode={colorCode} letter={inputHistory ? inputHistory[idx] : ''} autoFocus={idx === 0 &&  index === 0}/>
       ))}
     </div>
   );
