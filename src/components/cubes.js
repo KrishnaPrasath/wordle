@@ -173,6 +173,12 @@ const Cubes = () => {
           variant: 'Light',
         });
       }
+    } else {
+      addValidatedToastMessage({
+        body: `Please enter a five letter word!!`,
+        title: 'Instruction',
+        variant: 'Light',
+      });
     }
   };
 

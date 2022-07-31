@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Cubic = ({ id, colorCode, letter }) => {
   const [animate, setAnimate] = useState(false);
@@ -19,9 +19,16 @@ const Cubic = ({ id, colorCode, letter }) => {
 };
 
 const Cubicles = ({ colorCodes, inputHistory, index }) => {
+  const decoyInputReference = useRef(null);
+
+  useEffect(() => {
+    decoyInputReference?.current?.focus();
+  }, [])
+  
+
   return (
     <div className={`cubicles-wrapper`}>
-      <input className={`decoy d-none`} autoFocus></input>
+      { index === 0  && <input className={`decoy d-none`} ref={decoyInputReference}/>}
       {colorCodes.map((colorCode, idx) => (
         <Cubic id={`cubic${idx}`} key={idx} colorCode={colorCode} letter={inputHistory ? inputHistory[idx] : ''} autoFocus={idx === 0 &&  index === 0}/>
       ))}
