@@ -24,7 +24,7 @@ body {
 }
 
 .cubicles-container {
-  height: 75%;
+  height: 65%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -136,6 +136,30 @@ body {
   font-family: 'Permanent Marker', cursive;
 }
 
+.key-cube-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 1rem;
+  padding-top: 0.5rem;
+}
+
+.key-cube {
+  display: block;
+  min-height: 2rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: white;
+}
+
 /* animation */
 
 /* Animation property */
@@ -211,10 +235,132 @@ body {
     padding: 0.5rem;
     font-size: 2em;
   }
-}
-
-@media only screen and (max-width: 360px) {
   .cubicles-wrapper {
     padding: 0.8rem 0.5rem;
+  }
+
+  .cubicles-container {
+    flex-grow: 1;
+  }
+  .key-cube-container {
+    padding: 2rem 1rem;
+    padding-top: 0.5rem;
+  }
+
+  .cubes-container {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media only screen and (min-width: 1301px) {
+  .key-cube-container {
+    display: none;
+  }
+  .cubicles-container {
+    height: 75%;
+  }
+}
+
+@media only screen and (max-height: 896px) {
+  .title {
+    font-size: 2em;
+  }
+
+  .w-icon,
+  .reset-icon {
+    height: 2rem !important;
+    width: 2rem !important;
+  }
+
+  .modal-message {
+    padding: 0.25rem;
+    font-size: 1.5em;
+  }
+  .cubicles-wrapper {
+    padding: 0.5rem;
+  }
+}
+
+@media only screen and (max-height: 895px) {
+  .cubicles-wrapper {
+    padding: 0.5rem;
+  }
+  .cubic {
+    height: 4rem;
+    width: 4rem;
+  }
+}
+
+@media only screen and (max-height: 667px) {
+  .cubicles-wrapper {
+    padding: 0.2rem;
+  }
+  .cubic {
+    height: 3rem;
+    width: 3rem;
+    font-size: 28px;
+  }
+  .key-cube-container {
+    padding: 1rem 1.25rem;
+    gap: 8px;
+  }
+  .title {
+    font-size: 2em;
+  }
+
+  .w-icon,
+  .reset-icon {
+    height: 2rem !important;
+    width: 2rem !important;
+  }
+
+  .modal-message {
+    padding: 0.25rem;
+    font-size: 1.5em;
+  }
+  .cubicles-wrapper {
+    padding: 0.5rem;
+  }
+}
+
+@media only screen and (min-width: 520px) {
+  .key-cube-container {
+    gap: 10px;
+    width: 65%;
+    align-self: center;
+    margin: auto;
+  }
+  .key-cube {
+    display: block;
+    min-height: 2rem;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: white;
+  }
+}
+
+@media only screen and (min-height: 1024px) {
+  .key-cube-container {
+    gap: 10px;
+    width: 90%;
+    align-self: center;
+    margin: auto;
+  }
+  .key-cube {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 28px;
+  }
+  .cubic {
+    height: 4rem;
+    width: 4rem;
+    font-size: 28px;
   }
 }

@@ -18,14 +18,9 @@ const Cubic = ({ id, colorCode, letter }) => {
   );
 };
 
-const Cubicles = ({ colorCodes, inputHistory, index, decoyInputReference }) => {
-  useEffect(() => {
-    decoyInputReference?.current?.focus();
-  }, []);
-
+const Cubicles = ({ colorCodes, inputHistory, index }) => {
   return (
     <div className={`cubicles-wrapper`}>
-      {index === 0 && <input className={`decoy`} ref={decoyInputReference} />}
       {colorCodes.map((colorCode, idx) => (
         <Cubic
           id={`cubic${idx}`}
