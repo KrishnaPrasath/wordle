@@ -6,7 +6,8 @@ import { mock5LetterWords } from '../data/words';
 import { getRandomWord, useWindowSize, fillColorCodes } from '../utils/utils';
 import { GREEN, GREY, YELLOW, MAX_TRIES, WORD_LENGTH } from '../data/constants';
 import Confetti from 'react-confetti';
-import { Button } from 'react-bootstrap';
+import wordleImage from './../icons/wordle.svg';
+import replayIcon from './../icons/replay.svg';
 
 const Cubes = () => {
   const [word, setWord] = useState('');
@@ -21,17 +22,89 @@ const Cubes = () => {
   const [toastMessage, setToastMessage] = useState('');
   const difficultyLevel = 'easy';
 
+  // refs
+  const inputOneRef = React.useRef(inputOne);
+  const inputHistoryRef = React.useRef(inputHistory);
+  const triesRef = React.useRef(tries);
+  const wordRef = React.useRef(word);
+  const statusRef = React.useRef(status);
+
+  // decoy setStates
+  const _setInputOne = (enteredKey, keyCode = null) => {
+    if (keyCode === 'Backspace') {
+      inputOneRef.current = inputOneRef.current.slice(0, -1);
+      inputHistoryRef.current[triesRef.current] = inputOneRef.current;
+    } else {
+      inputOneRef.current = inputOneRef.current + enteredKey;
+      inputHistoryRef.current[triesRef.current] = inputOneRef.current;
+    }
+
+    setInputOne(inputOneRef.current);
+    setInputHistory((prev) => {
+      let temp = [...prev];
+      let _tries = triesRef.current;
+      if (_tries + 1 >= temp.length) {
+        temp[_tries] = inputHistoryRef.current[_tries];
+      }
+      return temp;
+    });
+  };
+
+  const _incrementTries = () => {
+    ++triesRef.current;
+    setTries(triesRef.current);
+  };
+
   const { width, height } = useWindowSize();
+
+  const setRandomWord = () => {
+    const word = getRandomWord(0, mock5LetterWords.length);
+    wordRef.current = word;
+    setWord(word);
+  };
+
+  const resetBtn = () => {
+    updateRef({ statusRef: null, triesRef: 0, inputHistoryRef: [], inputOneRef: '' });
+    setColorCodes(fillColorCodes(GREY));
+    setRandomWord();
+    setToastMessage('');
+    setModalMessage('');
+  };
+
+  useEffect(() => {
+    setRandomWord();
+  }, []);
 
   const addValidatedToastMessage = (message) => {
     setToastShow(true);
     setToastMessage(message);
   };
 
+  const updateRef = ({ ...refs }) => {
+    if ('statusRef' in refs) {
+      statusRef.current = refs.statusRef;
+      setStatus(statusRef.current);
+    }
+
+    if ('triesRef' in refs) {
+      triesRef.current = refs.triesRef;
+      setTries(triesRef.current);
+    }
+
+    if ('inputHistoryRef' in refs) {
+      inputHistoryRef.current = refs.inputHistoryRef;
+      setInputHistory(inputHistoryRef.current);
+    }
+
+    if ('inputOneRef' in refs) {
+      inputOneRef.current = refs.inputOneRef;
+      setInputOne(inputOneRef.current);
+    }
+  };
+
   const validationCallback = (codes) => {
     if (codes.every((i) => i === GREEN)) {
-      setTries(MAX_TRIES);
-      setStatus(1);
+      updateRef({ statusRef: 1 });
       setModalShow(true);
       setModalMessage('Congratulations! :)');
       addValidatedToastMessage({
@@ -40,9 +113,10 @@ const Cubes = () => {
         variant: 'Light',
       });
       return;
-    } else if (tries >= MAX_TRIES - 1) {
+    } else if (triesRef.current >= MAX_TRIES) {
+      updateRef({ statusRef: 0 });
       setModalShow(true);
-      setModalMessage('Better luck next time! :(');
+      setModalMessage(`Better luck next time! :( \n word: ${wordRef.current}`);
       addValidatedToastMessage({
         body: 'Better luck next time! :(',
         title: 'toast!!',
@@ -51,6 +125,7 @@ const Cubes = () => {
       return;
     }
     setInputOne('');
+    inputOneRef.current = '';
     return true;
   };
 
@@ -61,18 +136,17 @@ const Cubes = () => {
       let colorCode = GREY;
       if (
         verifiedLetters.includes(letter) &&
-        (word.match(regEx) || []).length <=
-          (verifiedLetters.join('').match(regEx) || []).length
+        (wordRef.current.match(regEx) || []).length <= (verifiedLetters.join('').match(regEx) || []).length
       ) {
         verifiedLetters.push(letter);
         return colorCode;
       } else {
         verifiedLetters.push(letter);
       }
-      if (word.includes(letter)) {
+      if (wordRef.current.includes(letter)) {
         colorCode = YELLOW;
       }
-      if (letter === word[idx]) {
+      if (letter === wordRef.current[idx]) {
         colorCode = GREEN;
       }
       return colorCode;
@@ -80,16 +154,16 @@ const Cubes = () => {
   };
 
   const verifyBtn = () => {
-    if (inputOne.length === WORD_LENGTH) {
-      if (mock5LetterWords.includes(inputOne) || difficultyLevel === 'easy') {
-        if (tries < MAX_TRIES) {
-          setTries((prev) => ++prev);
-          let currentColorCodes = generateColorCode(inputOne);
+    if (inputOneRef.current.length === WORD_LENGTH) {
+      if (mock5LetterWords.includes(inputOneRef.current) || difficultyLevel === 'easy') {
+        if (triesRef.current < MAX_TRIES) {
+          let currentColorCodes = generateColorCode(inputOneRef.current);
           setColorCodes((prev) => {
             let temp = [...prev];
-            temp[tries] = currentColorCodes;
+            temp[triesRef.current] = currentColorCodes; // _incrementTries gets completed before this line
             return temp;
           });
+          _incrementTries();
           validationCallback(currentColorCodes);
         }
       } else {
@@ -102,125 +176,63 @@ const Cubes = () => {
     }
   };
 
-  const setRandomWord = () => {
-    const word = getRandomWord(0, mock5LetterWords.length);
-    setWord(word);
-  };
-
-  const resetBtn = () => {
-    setColorCodes(fillColorCodes(GREY));
-    setStatus(0);
-    setInputHistory([]);
-    setTries(0);
-    setRandomWord();
-    setInputOne('');
-    setToastMessage('');
-  };
-
   const handleOnChange = (e) => {
-    // if(e.code === "Enter"){
-
-    //   return;
-    // }
-    // if(e.code)
-    // let currentGuess = e.key.toLowerCase();
-    // setInputOne(prevGuess => prevGuess + currentGuess);
-    // setInputHistory((prev) => {
-    //   let temp = [...prev];
-    //   if (tries + 1 >= temp.length && currentGuess) {
-    //     console.log(temp, tries)
-    //     temp[tries] = (temp[tries] ? temp[tries] : '') + currentGuess;
-    //   }
-    //   return temp;
-    // });
-    // Below is for input field
-    let currentGuess = e.target.value.toLowerCase();
-    setInputOne(currentGuess);
-    setInputHistory((prev) => {
-      let temp = [...prev];
-      if (tries + 1 >= temp.length && currentGuess) {
-        temp[tries] = currentGuess;
+    if (statusRef.current === null) {
+      if (e.code === 'Enter') {
+        verifyBtn();
+        return;
       }
-      return temp;
-    });
+      if (e.code === 'Backspace' && inputOneRef.current.length > 0) {
+        inputOneRef.current.length && _setInputOne('', e.code);
+        return;
+      }
+      const charCode = e.keyCode;
+      if (((charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123)) && inputOneRef.current.length < 5) {
+        _setInputOne(e.key.toLowerCase());
+        return;
+      }
+    }
   };
 
   useEffect(() => {
-    setRandomWord();
+    document.addEventListener('keydown', handleOnChange);
+
+    return () => document.addEventListener('keydown', handleOnChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleOnChange);
-
-    return () => window.addEventListener('keydown', handleOnChange);
-  }, [handleOnChange]);
 
   return (
     <>
-      {status === 1 && (
-        <Confetti width={width} height={height} numberOfPieces={200} />
-      )}
+      {status === 1 && <Confetti width={width} height={height} numberOfPieces={200} />}
       {toastMessage && (
-        <ToastEmitter
-          variant={'danger'}
-          show={toastShow}
-          message={toastMessage}
-          setToastShow={setToastShow}
-        />
+        <ToastEmitter variant={'danger'} show={toastShow} message={toastMessage} setToastShow={setToastShow} />
       )}
-      <div className='mb-3 w-50 m-auto'>
-        <input
-          id='inputOne'
-          value={inputOne}
-          onChange={handleOnChange}
-          maxLength={WORD_LENGTH}
-          autoFocus
-          onKeyPress={(e) => e.code === 'Enter' && verifyBtn()}
-          placeholder='Enter a 5 letter word...'
-          className='form-control mb-4 text-uppercase shadow-sm'
-          type='text'
-          aria-label='Enter a 5 letter word...'
-          aria-describedby='button-addon2'
-          autoComplete='off'
-        ></input>
-        <div className='d-flex'>
-          <Button
-            id='verifyBtn'
-            type='button'
-            onClick={verifyBtn}
-            className={`${
-              (tries >= MAX_TRIES || inputOne.length < WORD_LENGTH || status) &&
-              'tries-over'
-            } btn btn-outline-secondary m-auto w-50 shadow-sm`}
-            style={{ color: 'white' }}
-            size={'lg'}
-          >
-            VERIFY
-          </Button>
-          <Button
-            id='resetBtn'
-            type='button'
-            onClick={resetBtn}
-            className={`btn btn-outline-secondary m-auto shadow-sm`}
-            style={{ color: 'white' }}
-            size={'lg'}
-          >
-            RESET
-          </Button>
+      <div className="mb-3">
+        <div className="d-flex align-items-center title-container justify-content-around px-2">
+          <div className="">
+            <img src={wordleImage} className="w-icon rounded" alt="toast identifier" width={75} height={75} />
+          </div>
+          <h1 className="title col">Wordle</h1>
+          <div>
+            <img
+              id="resetBtn"
+              type="button"
+              onClick={resetBtn}
+              src={replayIcon}
+              className="rounded reset-icon"
+              alt="toast identifier"
+              width={50}
+              height={50}
+            />
+          </div>
         </div>
       </div>
-      {colorCodes.map((colorCode, idx) => (
-        <Cubicles
-          key={idx}
-          colorCodes={colorCode}
-          inputHistory={inputHistory[idx]}
-        />
-      ))}
-      <Modal
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        message={modalMessage}
-      />
+      <div className="cubicles-container">
+        {colorCodes.map((colorCode, idx) => (
+          <Cubicles key={idx} colorCodes={colorCode} inputHistory={inputHistory[idx]} />
+        ))}
+      </div>
+      <Modal show={modalShow} onHide={() => setModalShow(false)} message={modalMessage} />
     </>
   );
 };
