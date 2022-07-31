@@ -28,7 +28,7 @@ const Cubes = () => {
   const triesRef = React.useRef(tries);
   const wordRef = React.useRef(word);
   const statusRef = React.useRef(status);
-
+  const decoyInputReference = React.useRef(null);
   // decoy setStates
   const _setInputOne = (enteredKey, keyCode = null) => {
     if (keyCode === 'Backspace') {
@@ -69,6 +69,7 @@ const Cubes = () => {
     setRandomWord();
     setToastMessage('');
     setModalMessage('');
+    decoyInputReference?.current?.focus();
   };
 
   useEffect(() => {
@@ -235,7 +236,13 @@ const Cubes = () => {
       </div>
       <div className="cubicles-container">
         {colorCodes.map((colorCode, idx) => (
-          <Cubicles key={idx} index={idx} colorCodes={colorCode} inputHistory={inputHistory[idx]} />
+          <Cubicles
+            key={idx}
+            index={idx}
+            colorCodes={colorCode}
+            inputHistory={inputHistory[idx]}
+            decoyInputReference={decoyInputReference}
+          />
         ))}
       </div>
       <Modal show={modalShow} onHide={() => setModalShow(false)} message={modalMessage} />
