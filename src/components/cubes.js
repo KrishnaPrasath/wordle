@@ -5,16 +5,17 @@ import ToastEmitter from './ToastEmitter';
 import Modal from './ReportModal';
 import { mock5LetterWords } from '../data/words';
 import { getRandomWord, useWindowSize, fillColorCodes } from '../utils/utils';
-import { GREEN, GREY, YELLOW, MAX_TRIES, WORD_LENGTH } from '../data/constants';
+import { GREEN, GREY, YELLOW, MAX_TRIES, WORD_LENGTH, WHITE } from '../data/constants';
 import Confetti from 'react-confetti';
 import wordleImage from './../icons/wordle.svg';
 import replayIcon from './../icons/replay.svg';
+import { ALPHABETS } from '../data/words';
 
 const Cubes = () => {
   const [word, setWord] = useState('');
   const [inputOne, setInputOne] = useState('');
   const [inputHistory, setInputHistory] = useState([]);
-  const [colorCodes, setColorCodes] = useState(fillColorCodes(GREY));
+  const [colorCodes, setColorCodes] = useState(fillColorCodes(WHITE));
   const [tries, setTries] = useState(0);
   const [status, setStatus] = useState(null); // 0 = no win ; 1 = win;
   const [modalShow, setModalShow] = useState(false);
@@ -22,6 +23,9 @@ const Cubes = () => {
   const [toastShow, setToastShow] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const difficultyLevel = 'easy';
+  const [rowFinished, setRowFinished] = useState(true);
+  const [resetIndicator, setResetIndicator] = useState(false);
+  const [colorCodeMapper, setColorCodeMapper] = useState(ALPHABETS);
 
   // refs
   const inputOneRef = React.useRef(inputOne);
@@ -29,6 +33,9 @@ const Cubes = () => {
   const triesRef = React.useRef(tries);
   const wordRef = React.useRef(word);
   const statusRef = React.useRef(status);
+  const rowFinishedRef = React.useRef(rowFinished);
+  const colorCodeMapperRef = React.useRef(colorCodeMapper);
+
   // decoy setStates
   const _setInputOne = (enteredKey, keyCode = null) => {
     if (keyCode === 'Backspace') {
@@ -50,6 +57,24 @@ const Cubes = () => {
     });
   };
 
+  const _setColorCodeMapper = (letter, colorCode) => {
+    const LETTER = letter && letter.toUpperCase();
+    setColorCodeMapper(prev => {
+      let temp = {...prev};
+      if(colorCode !== WHITE){
+        if(temp[LETTER] === YELLOW && colorCode === GREEN) {
+          temp[LETTER] = colorCode;
+        } else if(temp[LETTER] === GREY && colorCode !== GREY) {
+          temp[LETTER] = colorCode;
+        } else if(temp[LETTER] !== GREEN){
+          temp[LETTER] = colorCode;
+        }
+        colorCodeMapperRef.current = temp;
+        return temp;
+      }
+    });
+  }
+
   const _incrementTries = () => {
     ++triesRef.current;
     setTries(triesRef.current);
@@ -64,8 +89,9 @@ const Cubes = () => {
   };
 
   const resetBtn = () => {
-    updateRef({ statusRef: null, triesRef: 0, inputHistoryRef: [], inputOneRef: '' });
-    setColorCodes(fillColorCodes(GREY));
+    setResetIndicator(true);
+    updateRef({ statusRef: null, triesRef: 0, inputHistoryRef: [], inputOneRef: '', colorCodeMapperRef: ALPHABETS });
+    setColorCodes(fillColorCodes(WHITE));
     setRandomWord();
     setToastMessage('');
     setModalMessage('');
@@ -100,28 +126,39 @@ const Cubes = () => {
       inputOneRef.current = refs.inputOneRef;
       setInputOne(inputOneRef.current);
     }
+
+    if ('colorCodeMapperRef' in refs) {
+      colorCodeMapperRef.current = refs.colorCodeMapperRef;
+      setColorCodeMapper(colorCodeMapperRef.current);
+    }
   };
 
   const validationCallback = (codes) => {
     if (codes.every((i) => i === GREEN)) {
       updateRef({ statusRef: 1 });
-      setModalShow(true);
-      setModalMessage('Congratulations! :)');
-      addValidatedToastMessage({
-        body: 'Congratulations!',
-        title: 'toast!!',
-        variant: 'Light',
-      });
+      setTimeout(() => {
+        setModalShow(true);
+        setModalMessage('Congratulations! :)');
+        addValidatedToastMessage({
+          body: 'Congratulations!',
+          title: 'toast!!',
+          variant: 'Light',
+        });  
+      }, 3000);
+      
       return;
     } else if (triesRef.current >= MAX_TRIES) {
       updateRef({ statusRef: 0 });
-      setModalShow(true);
-      setModalMessage(`Better luck next time! :( \n word: ${wordRef.current}`);
-      addValidatedToastMessage({
-        body: 'Better luck next time! :(',
-        title: 'toast!!',
-        variant: 'Light',
-      });
+      setTimeout(() => {
+        setModalShow(true);
+        setModalMessage(`Better luck next time! :( \n word: ${wordRef.current}`);
+        addValidatedToastMessage({
+          body: 'Better luck next time! :(',
+          title: 'toast!!',
+          variant: 'Light',
+        });
+      }, 3000);
+      
       return;
     }
     setInputOne('');
@@ -149,6 +186,7 @@ const Cubes = () => {
       if (letter === wordRef.current[idx]) {
         colorCode = GREEN;
       }
+      _setColorCodeMapper(letter, colorCode);
       return colorCode;
     });
   };
@@ -160,7 +198,7 @@ const Cubes = () => {
           let currentColorCodes = generateColorCode(inputOneRef.current);
           setColorCodes((prev) => {
             let temp = [...prev];
-            temp[triesRef.current] = currentColorCodes; // _incrementTries gets completed before this line
+            temp[triesRef.current - 1] = currentColorCodes; // _incrementTries gets completed before this line
             return temp;
           });
           _incrementTries();
@@ -183,7 +221,7 @@ const Cubes = () => {
   };
 
   const handleOnChange = (e, type = null) => {
-    console.log(e, type);
+    if(rowFinishedRef.current){
     if (type === 'CLICK') {
       if (e === 'SUBMIT') {
         verifyBtn();
@@ -213,12 +251,13 @@ const Cubes = () => {
         return;
       }
     }
+  }
   };
 
   useEffect(() => {
     document.addEventListener('keydown', handleOnChange);
 
-    return () => document.addEventListener('keydown', handleOnChange);
+    return () => document.removeEventListener('keydown', handleOnChange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -250,11 +289,11 @@ const Cubes = () => {
       </div>
       <div className="cubicles-container">
         {colorCodes.map((colorCode, idx) => (
-          <Cubicles key={idx} index={idx} colorCodes={colorCode} inputHistory={inputHistory[idx]} />
+          <Cubicles key={idx} index={idx} colorCodes={colorCode} inputHistory={inputHistory[idx]} setRowFinished={setRowFinished} rowFinishedRef={rowFinishedRef} resetIndicator={resetIndicator} setResetIndicator={setResetIndicator}/>
         ))}
       </div>
-      <div className="key-cube-container">
-        <Keypad id={'keyPad'} handleOnChange={handleOnChange} />
+      <div className="key-cube-container pb-3">
+        <Keypad id={'keyPad'} handleOnChange={handleOnChange} colorCodeMapper={colorCodeMapper} resetIndicator={resetIndicator}/>
       </div>
       <Modal show={modalShow} onHide={() => setModalShow(false)} message={modalMessage} />
     </>

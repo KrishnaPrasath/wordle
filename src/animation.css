@@ -1,0 +1,16 @@
+@keyframes flip-card {
+    0% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(0);
+
+    }
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+.flip-card {
+    animation: flip-card 0.5s ease-in-out;
+  }

@@ -24,10 +24,10 @@ body {
 }
 
 .cubicles-container {
-  height: 65%;
+  height: 55%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .App {
@@ -96,7 +96,8 @@ body {
 .cubicles-wrapper {
   padding: 1rem;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  gap: 10px;
   align-items: center;
 }
 
@@ -107,15 +108,19 @@ body {
 }
 
 .grey {
-  background-color: #bbbbbf;
+  background-color: #bbbbbf !important;
+}
+
+.white {
+  background-color: white;
 }
 
 .green {
-  background-color: #9ef01a;
+  background-color: #9ef01a !important;
 }
 
 .yellow {
-  background-color: #ffd60a;
+  background-color: #ffd60a !important;
 }
 
 .title {
@@ -144,13 +149,14 @@ body {
   gap: 6px;
   padding: 0 1rem;
   padding-top: 0.5rem;
+  flex-shrink: 0;
 }
 
 .key-cube {
   display: block;
   min-height: 2rem;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -158,6 +164,10 @@ body {
   font-weight: 600;
   text-transform: capitalize;
   background: white;
+}
+
+.special_key {
+  width: 3rem !important;
 }
 
 /* animation */
@@ -211,10 +221,8 @@ body {
   }
 }
 
-.press {
+.press .flip-card {
   animation: press 0.5s ease-in-out;
-  /* transform: scale(0.8); */
-  /* Scaling button to 0.98 to its original size */
   box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
   /* Lowering the shadow */
 }
@@ -243,13 +251,19 @@ body {
     flex-grow: 1;
   }
   .key-cube-container {
-    padding: 2rem 1rem;
+    padding: 0;
     padding-top: 0.5rem;
+    gap: 3px;
   }
 
   .cubes-container {
     display: flex;
     flex-direction: column;
+  }
+
+  .cubic {
+    width: 4rem;
+    height: 4rem;
   }
 }
 
@@ -262,9 +276,21 @@ body {
   }
 }
 
+
+@media only screen and (max-width: 896px) {
+  .modal-message {
+    padding: 1rem;
+    font-size: 2.5em;
+  }
+}
 @media only screen and (max-height: 896px) {
   .title {
     font-size: 2em;
+  }
+
+  .cubic {
+    height: 4rem;
+    width: 4rem;
   }
 
   .w-icon,
@@ -302,9 +328,16 @@ body {
     font-size: 28px;
   }
   .key-cube-container {
-    padding: 1rem 1.25rem;
-    gap: 8px;
+    gap: 3px;
+    padding: 0.5rem 0.5rem;
   }
+
+  .key-cube {
+    width: 2.1rem;
+    height: 2.1rem;
+    font-size: 24px;
+  }
+
   .title {
     font-size: 2em;
   }
@@ -327,15 +360,14 @@ body {
 @media only screen and (min-width: 520px) {
   .key-cube-container {
     gap: 10px;
-    width: 65%;
+    width: 95%;
     align-self: center;
     margin: auto;
   }
   .key-cube {
     display: block;
-    min-height: 2rem;
-    width: 4rem;
-    height: 4rem;
+    width: 3rem;
+    height: 3rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -344,14 +376,18 @@ body {
     text-transform: capitalize;
     background: white;
   }
+  .special_key {
+    width: 5rem !important;
+  }
 }
 
 @media only screen and (min-height: 1024px) {
   .key-cube-container {
     gap: 10px;
-    width: 90%;
+    width: 95%;
     align-self: center;
     margin: auto;
+    flex-grow: 1;
   }
   .key-cube {
     width: 3.5rem;
